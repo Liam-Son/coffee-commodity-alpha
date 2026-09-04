@@ -21,18 +21,21 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 - **Pipeline overview**: [notebooks/01_weather_yield_price_pipeline.md](notebooks/01_weather_yield_price_pipeline.md)
 - **Index construction**: [src/weather_indices.py](src/weather_indices.py) – Extreme Heat Days, GDD/HDD, soil-moisture anomalies, composite stress
 - **Models**: [src/yield_price_models.py](src/yield_price_models.py) – Yield response functions + baseline vs weather-augmented price models
+- **Inference**: [src/block_bootstrap.py](src/block_bootstrap.py) – Moving Block Bootstrap (residual & pairs) with percentile CIs and block-length robustness
+- **Bootstrap usage**: [notebooks/02_block_bootstrap_usage.md](notebooks/02_block_bootstrap_usage.md)
 
 ### What the pipeline does
 1. Builds extreme-heat-day and soil-moisture indices for Brazil (coffee), Kenya & Assam (tea)
 2. Estimates simple yield response functions (EHD + soil moisture + interaction)
 3. Tests whether weather anomalies improve short-term coffee price models (AIC/BIC, adj. R², out-of-sample)
+4. Provides both HAC (Newey–West) and Moving Block Bootstrap inference for short samples
 
 ## Structure
 
 ```
 ├── research/          # Literature notes and findings
 ├── notebooks/         # Pipeline documentation & analysis
-├── src/               # Reusable code (indices + models)
+├── src/               # Reusable code (indices, models, bootstrap)
 ├── data/              # (to be populated) Raw & processed datasets
 └── strategies/        # Signal definitions and backtests
 ```
