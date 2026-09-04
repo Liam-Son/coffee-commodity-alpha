@@ -12,20 +12,31 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 
 ## Research Notes
 
-- [Weather Impact on Coffee Yields](research/weather-impact-on-coffee-yields.md) – Temperature, frost, drought, rainfall timing, climate change outlook, and data sources.
-- [Climate Change Impact on Tea](research/climate-change-impact-on-tea.md) – Temperature extremes, regional suitability shifts, quality effects, and comparison with coffee.
-- [Quantitative Weather–Yield: Coffee vs Tea](research/quantitative-weather-yield-coffee-vs-tea.md) – Elasticities, extreme-day effects, quality channels, and regional deep dives (Kenya, Assam, China, Brazil).
+- [Weather Impact on Coffee Yields](research/weather-impact-on-coffee-yields.md)
+- [Climate Change Impact on Tea](research/climate-change-impact-on-tea.md)
+- [Quantitative Weather–Yield: Coffee vs Tea](research/quantitative-weather-yield-coffee-vs-tea.md)
 
-## Structure (planned)
+## Quantitative Pipeline (Steps 1–3)
+
+- **Pipeline overview**: [notebooks/01_weather_yield_price_pipeline.md](notebooks/01_weather_yield_price_pipeline.md)
+- **Index construction**: [src/weather_indices.py](src/weather_indices.py) – Extreme Heat Days, GDD/HDD, soil-moisture anomalies, composite stress
+- **Models**: [src/yield_price_models.py](src/yield_price_models.py) – Yield response functions + baseline vs weather-augmented price models
+
+### What the pipeline does
+1. Builds extreme-heat-day and soil-moisture indices for Brazil (coffee), Kenya & Assam (tea)
+2. Estimates simple yield response functions (EHD + soil moisture + interaction)
+3. Tests whether weather anomalies improve short-term coffee price models (AIC/BIC, adj. R², out-of-sample)
+
+## Structure
 
 ```
 ├── research/          # Literature notes and findings
-├── data/              # Raw & processed datasets (weather, yields, prices)
-├── notebooks/         # Exploratory analysis and models
-├── strategies/        # Signal definitions and backtests
-└── src/               # Reusable code
+├── notebooks/         # Pipeline documentation & analysis
+├── src/               # Reusable code (indices + models)
+├── data/              # (to be populated) Raw & processed datasets
+└── strategies/        # Signal definitions and backtests
 ```
 
 ## Key Insight
 
-Coffee yields (especially Arabica) are highly sensitive to weather extremes. Frost in Brazil, drought in Vietnam/Brazil, and rainfall anomalies in Colombia regularly create supply shocks that move prices. Quantifying these relationships is central to generating alpha. Tea shows parallel climate vulnerabilities with regionally heterogeneous outcomes.
+Coffee yields (especially Arabica) are highly sensitive to weather extremes. Quantifying nonlinear heat and moisture effects — and testing their incremental value for price forecasting — is central to generating alpha. Tea provides a useful comparative climate-risk benchmark.
