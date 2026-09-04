@@ -14,6 +14,7 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 
 - [Weather Impact on Coffee Yields](research/weather-impact-on-coffee-yields.md) – Temperature, frost, drought, rainfall timing, climate change outlook, and data sources.
 - [Climate Change Impact on Tea](research/climate-change-impact-on-tea.md) – Temperature extremes, regional suitability shifts, quality effects, and comparison with coffee.
+- [Quantitative Weather–Yield: Coffee vs Tea](research/quantitative-weather-yield-coffee-vs-tea.md) – Elasticities, extreme-day effects, quality channels, and regional deep dives (Kenya, Assam, China, Brazil).
 
 ## Structure (planned)
 
