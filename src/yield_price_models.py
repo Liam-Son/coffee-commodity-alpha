@@ -2,6 +2,7 @@
 Yield response functions and price-model tests.
 
 Steps 2 and 3 of the quantitative pipeline.
+Also exposes optional Moving Block Bootstrap inference.
 """
 
 from __future__ import annotations
@@ -10,6 +11,8 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from typing import Optional
+
+from .block_bootstrap import bootstrap_from_model, block_length_robustness
 
 
 def estimate_yield_response(
@@ -23,6 +26,8 @@ def estimate_yield_response(
     Simple OLS yield response:
 
         yield = α + β1·EHD + β2·SM + β3·EHD×SM + controls + ε
+
+    Returns a statsmodels results object fitted with HAC (Newey–West) SEs.
     """
     data = df.dropna(subset=[yield_col, ehd_col, sm_col]).copy()
     data["ehd_x_sm"] = data[ehd_col] * data[sm_col]
@@ -35,6 +40,31 @@ def estimate_yield_response(
     y = data[yield_col]
     model = sm.OLS(y, X).fit(cov_type="HAC", cov_kwds={"maxlags": 2})
     return model
+
+
+def estimate_yield_response_bootstrap(
+    df: pd.DataFrame,
+    yield_col: str = "log_yield",
+    ehd_col: str = "ehd",
+    sm_col: str = "sm_anom",
+    controls: Optional[list[str]] = None,
+    block_length: int = 3,
+    n_boot: int = 999,
+    method: str = "residual",
+) -> pd.DataFrame:
+    """
+    Fit the yield response model and return Moving Block Bootstrap summary
+    (point estimate, bootstrap SE, percentile CI).
+    """
+    model = estimate_yield_response(
+        df, yield_col=yield_col, ehd_col=ehd_col, sm_col=sm_col, controls=controls
+    )
+    return bootstrap_from_model(
+        model,
+        block_length=block_length,
+        n_boot=n_boot,
+        method=method,  # type: ignore
+    )
 
 
 def price_baseline(
