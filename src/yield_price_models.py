@@ -12,7 +12,10 @@ import pandas as pd
 import statsmodels.api as sm
 from typing import Optional
 
-from .block_bootstrap import bootstrap_from_model, block_length_robustness
+try:
+    from .block_bootstrap import bootstrap_from_model, block_length_robustness
+except ImportError:
+    from block_bootstrap import bootstrap_from_model, block_length_robustness
 
 
 def estimate_yield_response(
