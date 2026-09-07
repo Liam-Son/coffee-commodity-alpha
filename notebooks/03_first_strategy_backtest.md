@@ -1,17 +1,19 @@
 # First Strategy + Backtest Framework
 
-**Minimal weather-stress long strategy on Arabica coffee futures (KC)**
+**Weather-stress long/short strategy on Arabica coffee futures (KC)**
 
 ## Goal
-Provide a clean, runnable skeleton so we can produce a real equity curve and performance table, then swap in genuine weather indices.
+Clean, runnable skeleton that produces a real equity curve and performance table.  
+Synthetic stress is used only so the framework can be validated end-to-end.  
+Real weather indices will replace it later.
 
 ## Components
 
 | File | Role |
 |------|------|
-| `src/data_loaders.py` | Load KC=F daily prices (yfinance) + synthetic stress placeholder |
-| `src/backtest.py` | Vectorized long/flat backtester + performance stats |
-| `strategies/weather_stress_long.py` | First strategy: long when stress > threshold |
+| `src/data_loaders.py` | KC=F daily prices (yfinance) + improved seasonal synthetic stress |
+| `src/backtest.py` | Vectorized long/flat (or long/short) backtester + stats |
+| `strategies/weather_stress_long.py` | Long when stress high, light short when stress low |
 
 ## How to run
 
@@ -21,40 +23,36 @@ pip install yfinance pandas numpy matplotlib
 python strategies/weather_stress_long.py
 ```
 
-This will:
-1. Download daily KC=F from 2015 onward
-2. Build a **synthetic** monthly stress series (demo only)
-3. Go long when stress > 1.0, otherwise flat
-4. Apply 5 bp transaction costs on turnover
-5. Print CAGR / Vol / Sharpe / MaxDD / Hit-Rate for strategy vs buy-and-hold
-6. Save an equity-curve chart to `artifacts/first_strategy_equity.png`
+Output:
+1. Annualised performance table (Strategy vs Buy & Hold)
+2. Equity-curve chart saved to `artifacts/stress_ls_equity.png`
 
-## Sample output (framework demo)
+### Chart panels (easy to check)
+- **Top** – Growth of $1 (log scale): Stress L/S vs Buy & Hold KC
+- **Middle** – Stress index with long (green) and short (purple) thresholds
+- **Bottom** – Position over time (−0.5 / 0 / +1)
 
-Because the stress series is synthetic/random, the strategy is **not** expected to beat buy-and-hold. Typical demo numbers look roughly like:
+## Strategy logic (current demo)
 
-```
-         CAGR    Vol  Sharpe  MaxDD  HitRate
-Strategy 0.03   0.14    0.22  -0.30     0.09
-BuyHold  0.13   0.34    0.38  -0.52     0.49
-```
+- **Long (+1)** when stress > 1.2
+- **Light short (−0.5)** when stress < −0.2
+- Flat otherwise
+- Next-bar execution, 5 bp cost on turnover
 
-The chart shows:
-- Top panel: growth of $1 (strategy vs buy-and-hold)
-- Middle: stress index with the 1.0 threshold line
-- Bottom: position (0/1)
+Synthetic stress includes:
+- Higher base level in Brazil frost window (May–Aug) and flowering period (Sep–Dec)
+- Realised volatility component
+- Occasional strong positive shocks
 
-## Next upgrades (in priority order)
+## Important caveat
 
-1. **Replace synthetic stress** with real output from `src/weather_indices.py` (EHD, soil-moisture anomaly, composite stress) once ERA5 / yield data are loaded.
-2. Add lag alignment so that weather observed in month *t* only affects positions from month *t+1* onward (no look-ahead).
-3. Test alternative thresholds, long/short versions, and volatility targeting.
-4. Move from daily continuous futures to a proper front-month roll series if desired.
-5. Add walk-forward or simple out-of-sample split.
+Because the stress series is still synthetic, the performance numbers are **not** evidence of alpha.  
+They only prove that the backtest plumbing works.
 
-## Design principles
+## Next upgrades (priority)
 
-- Signal is lagged by one bar → realistic next-day execution.
-- Costs are applied on absolute position change.
-- Everything is vectorized and dependency-light.
-- The same `run_backtest` function can accept any future signal (price-based, weather-based, or hybrid).
+1. Replace `synthetic_stress()` with real EHD / soil-moisture / composite indices from `src/weather_indices.py`.
+2. Enforce proper publication lag (weather observed in month *t* only affects positions from month *t+1*).
+3. Add volatility targeting or risk-parity sizing.
+4. Walk-forward or simple train/test split.
+5. Optional: switch from continuous KC=F to a proper front-month roll series.

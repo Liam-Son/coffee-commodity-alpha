@@ -40,30 +40,36 @@ def load_coffee_futures(
 def synthetic_stress(
     price: pd.Series,
     seed: int = 42,
-    threshold_scale: float = 1.0,
 ) -> pd.Series:
     """
-    DEMO ONLY – synthetic monthly stress index.
+    DEMO ONLY – improved synthetic monthly stress index with seasonal structure.
 
-    Combines realised volatility with occasional random positive shocks
-    that stand in for heat / drought events.  Replace this function with
-    real output from weather_indices.py (EHD, soil-moisture anomaly,
-    composite stress) as soon as the data pipeline is populated.
+    - Higher base risk in Brazil frost window (May–Aug) and flowering period (Sep–Dec)
+    - Realised volatility component
+    - Occasional strong positive shocks (proxy for extreme heat / drought)
+
+    Replace this function with real output from weather_indices.py
+    (EHD, soil-moisture anomaly, composite stress) as soon as data is available.
     """
     rng = np.random.default_rng(seed)
     monthly = price.resample("ME").last().to_frame("price")
     monthly["ret"] = monthly["price"].pct_change()
     monthly["vol"] = monthly["ret"].rolling(6, min_periods=1).std().fillna(0)
+    monthly["month"] = monthly.index.month
 
-    shock = rng.normal(0, 1, len(monthly))
-    # Sparse strong positive shocks (proxy for extreme weather)
-    shock[::17] += 2.5 * threshold_scale
-    shock[::23] += 1.8 * threshold_scale
+    # Seasonal risk profile (coffee-relevant windows)
+    seasonal = np.zeros(len(monthly))
+    seasonal[monthly["month"].isin([5, 6, 7, 8])] = 0.6   # frost risk window
+    seasonal[monthly["month"].isin([9, 10, 11, 12])] = 0.4  # flowering / early set
 
-    monthly["stress"] = (monthly["vol"] * 2 + shock).clip(-1, 4)
+    shock = rng.normal(0, 0.7, len(monthly))
+    for i, m in enumerate(monthly["month"]):
+        if m in [5, 6, 7, 8, 9, 10] and rng.random() < 0.18:
+            shock[i] += rng.uniform(1.5, 3.0)
+
+    monthly["stress"] = (0.5 * monthly["vol"] * 3 + seasonal + shock).clip(-0.5, 4.0)
     monthly["stress"] = monthly["stress"].rolling(2, min_periods=1).mean()
 
-    # Forward-fill to daily
     stress = monthly["stress"].reindex(price.index, method="ffill").fillna(0)
     stress.name = "stress"
     return stress
