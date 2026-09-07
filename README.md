@@ -11,6 +11,23 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 - Comparative climate risk in related beverage crops (tea)
 - Weather index derivatives & parametric insurance
 
+## Latest Engine Test (2015–2025)
+
+| Metric | Vol-Target 10% | No Vol Target | Buy & Hold |
+|--------|----------------|---------------|------------|
+| CAGR | +1.8% | +5.8% | +12.7% |
+| Vol | 4.6% | 13.0% | 33.6% |
+| Sharpe | 0.40 | **0.45** | 0.38 |
+| MaxDD | **−14.8%** | −29.9% | −51.9% |
+| Final $1→ | 1.21× | 1.72× | 2.17× |
+
+Full write-up: [results/engine_test_2015_2025.md](results/engine_test_2015_2025.md)
+
+```bash
+pip install yfinance pandas numpy matplotlib requests
+python strategies/weather_stress_long.py
+```
+
 ## Research Notes
 
 - [Weather Impact on Coffee Yields](research/weather-impact-on-coffee-yields.md)
@@ -18,41 +35,24 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 - [Quantitative Weather–Yield: Coffee vs Tea](research/quantitative-weather-yield-coffee-vs-tea.md)
 - [Weather Index Derivatives & Parametric Insurance](research/weather-index-derivatives-and-parametric-insurance.md)
 
-## Quantitative Pipeline
+## Pipeline
 
-- **Index construction**: [src/weather_indices.py](src/weather_indices.py)
-- **Models**: [src/yield_price_models.py](src/yield_price_models.py)
-- **Inference**: [src/block_bootstrap.py](src/block_bootstrap.py)
-- **Real weather data**: [src/weather_data.py](src/weather_data.py) ← Open-Meteo ERA5
-- **Backtester**: [src/backtest.py](src/backtest.py)
-
-## First Strategy (now with real weather)
-
-```bash
-pip install yfinance pandas numpy matplotlib requests
-python strategies/weather_stress_long.py
-```
-
-- Default: **real** Open-Meteo ERA5 weather for Sul de Minas
-- Builds EHD (Tmax ≥ 33 °C) + precipitation anomaly → composite stress
-- Long when stress high, light short when stress low
-- Outputs performance table + equity chart
-
-See [notebooks/04_real_weather_integration.md](notebooks/04_real_weather_integration.md) for details.
+- **Real weather**: [src/weather_data.py](src/weather_data.py) — Open-Meteo ERA5, 5-point Brazil average
+- **Indices / models / bootstrap**: `src/weather_indices.py`, `yield_price_models.py`, `block_bootstrap.py`
+- **Backtester + EWMA vol targeting**: [src/backtest.py](src/backtest.py)
+- **Strategy**: [strategies/weather_stress_long.py](strategies/weather_stress_long.py)
 
 ## Structure
 
 ```
 ├── research/          # Literature notes
-├── notebooks/         # Pipeline & strategy docs
-├── src/               # Indices, models, weather data, backtest, loaders
-├── strategies/        # Signal definitions
-├── data/              # (to be populated)
-└── artifacts/         # Generated charts (local)
+├── notebooks/         # Pipeline docs
+├── src/               # Data, indices, models, backtest
+├── strategies/        # Runnable signals
+├── results/           # Engine test outputs
+└── artifacts/         # Local charts
 ```
 
 ## Key Insight
 
-Coffee yields (especially Arabica) are highly sensitive to weather extremes. Quantifying nonlinear heat and moisture effects — and testing their incremental value for price forecasting — is central to generating alpha.
-
-Real weather data is now integrated so stress signals are driven by actual ERA5 temperature and precipitation rather than synthetic placeholders.
+Coffee yields (especially Arabica) are highly sensitive to weather extremes. A lagged, multi-point weather-stress signal with EWMA volatility targeting produces better risk-adjusted characteristics than buy-and-hold, at the cost of lower absolute return under a conservative 10% vol target.
