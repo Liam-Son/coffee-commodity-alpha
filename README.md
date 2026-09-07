@@ -9,12 +9,14 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 - Seasonality, stocks, and demand dynamics
 - Quantitative signals and backtesting
 - Comparative climate risk in related beverage crops (tea)
+- **Weather index derivatives & parametric insurance** (risk transfer, basis risk, product design)
 
 ## Research Notes
 
 - [Weather Impact on Coffee Yields](research/weather-impact-on-coffee-yields.md)
 - [Climate Change Impact on Tea](research/climate-change-impact-on-tea.md)
 - [Quantitative Weather–Yield: Coffee vs Tea](research/quantitative-weather-yield-coffee-vs-tea.md)
+- [Weather Index Derivatives & Parametric Insurance](research/weather-index-derivatives-and-parametric-insurance.md) ← *new*
 
 ## Quantitative Pipeline (Steps 1–3)
 
@@ -30,6 +32,13 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 3. Tests whether weather anomalies improve short-term coffee price models (AIC/BIC, adj. R², out-of-sample)
 4. Provides both HAC (Newey–West) and Moving Block Bootstrap inference for short samples
 
+### Extension opportunity (parametric / derivatives)
+The same indices and yield models can be used to:
+- Design candidate parametric insurance underlyings
+- Quantify basis risk against historical yields
+- Prototype simple burn-analysis pricing and payout structures
+- Evaluate hedging effectiveness for supply-side risk
+
 ## Structure
 
 ```
@@ -43,3 +52,5 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 ## Key Insight
 
 Coffee yields (especially Arabica) are highly sensitive to weather extremes. Quantifying nonlinear heat and moisture effects — and testing their incremental value for price forecasting — is central to generating alpha. Tea provides a useful comparative climate-risk benchmark.
+
+Weather-index derivatives and parametric insurance form the practical risk-transfer layer: the same indices that drive yield and price models can underpin insurance products and synthetic hedges, subject to careful management of basis risk.
