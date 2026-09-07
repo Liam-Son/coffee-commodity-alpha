@@ -9,7 +9,7 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 - Seasonality, stocks, and demand dynamics
 - Quantitative signals and backtesting
 - Comparative climate risk in related beverage crops (tea)
-- Weather index derivatives & parametric insurance (risk transfer, basis risk, product design)
+- Weather index derivatives & parametric insurance
 
 ## Research Notes
 
@@ -18,47 +18,41 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 - [Quantitative Weather–Yield: Coffee vs Tea](research/quantitative-weather-yield-coffee-vs-tea.md)
 - [Weather Index Derivatives & Parametric Insurance](research/weather-index-derivatives-and-parametric-insurance.md)
 
-## Quantitative Pipeline (Steps 1–3)
+## Quantitative Pipeline
 
-- **Pipeline overview**: [notebooks/01_weather_yield_price_pipeline.md](notebooks/01_weather_yield_price_pipeline.md)
-- **Index construction**: [src/weather_indices.py](src/weather_indices.py) – Extreme Heat Days, GDD/HDD, soil-moisture anomalies, composite stress
-- **Models**: [src/yield_price_models.py](src/yield_price_models.py) – Yield response functions + baseline vs weather-augmented price models
-- **Inference**: [src/block_bootstrap.py](src/block_bootstrap.py) – Moving Block Bootstrap (residual & pairs) with percentile CIs and block-length robustness
-- **Bootstrap usage**: [notebooks/02_block_bootstrap_usage.md](notebooks/02_block_bootstrap_usage.md)
-
-### What the pipeline does
-1. Builds extreme-heat-day and soil-moisture indices for Brazil (coffee), Kenya & Assam (tea)
-2. Estimates simple yield response functions (EHD + soil moisture + interaction)
-3. Tests whether weather anomalies improve short-term coffee price models (AIC/BIC, adj. R², out-of-sample)
-4. Provides both HAC (Newey–West) and Moving Block Bootstrap inference for short samples
-
-## First Strategy & Backtest Framework
-
-- **Strategy**: [strategies/weather_stress_long.py](strategies/weather_stress_long.py) – long KC when stress proxy is elevated
+- **Index construction**: [src/weather_indices.py](src/weather_indices.py)
+- **Models**: [src/yield_price_models.py](src/yield_price_models.py)
+- **Inference**: [src/block_bootstrap.py](src/block_bootstrap.py)
+- **Real weather data**: [src/weather_data.py](src/weather_data.py) ← Open-Meteo ERA5
 - **Backtester**: [src/backtest.py](src/backtest.py)
-- **Data loaders**: [src/data_loaders.py](src/data_loaders.py) (KC=F + synthetic stress placeholder)
-- **Walk-through**: [notebooks/03_first_strategy_backtest.md](notebooks/03_first_strategy_backtest.md)
+
+## First Strategy (now with real weather)
 
 ```bash
-pip install yfinance pandas numpy matplotlib
+pip install yfinance pandas numpy matplotlib requests
 python strategies/weather_stress_long.py
 ```
-Produces a performance table and an equity-curve chart.  
-**Important**: the current stress series is synthetic (demo only). Replace it with real weather indices for meaningful results.
+
+- Default: **real** Open-Meteo ERA5 weather for Sul de Minas
+- Builds EHD (Tmax ≥ 33 °C) + precipitation anomaly → composite stress
+- Long when stress high, light short when stress low
+- Outputs performance table + equity chart
+
+See [notebooks/04_real_weather_integration.md](notebooks/04_real_weather_integration.md) for details.
 
 ## Structure
 
 ```
-├── research/          # Literature notes and findings
-├── notebooks/         # Pipeline documentation & analysis
-├── src/               # Reusable code (indices, models, bootstrap, backtest, loaders)
-├── strategies/        # Signal definitions and backtests
-├── data/              # (to be populated) Raw & processed datasets
-└── artifacts/         # Generated charts / outputs (local)
+├── research/          # Literature notes
+├── notebooks/         # Pipeline & strategy docs
+├── src/               # Indices, models, weather data, backtest, loaders
+├── strategies/        # Signal definitions
+├── data/              # (to be populated)
+└── artifacts/         # Generated charts (local)
 ```
 
 ## Key Insight
 
-Coffee yields (especially Arabica) are highly sensitive to weather extremes. Quantifying nonlinear heat and moisture effects — and testing their incremental value for price forecasting — is central to generating alpha. Tea provides a useful comparative climate-risk benchmark.
+Coffee yields (especially Arabica) are highly sensitive to weather extremes. Quantifying nonlinear heat and moisture effects — and testing their incremental value for price forecasting — is central to generating alpha.
 
-Weather-index derivatives and parametric insurance form the practical risk-transfer layer: the same indices that drive yield and price models can underpin insurance products and synthetic hedges, subject to careful management of basis risk.
+Real weather data is now integrated so stress signals are driven by actual ERA5 temperature and precipitation rather than synthetic placeholders.
