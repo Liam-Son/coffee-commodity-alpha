@@ -9,14 +9,14 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 - Seasonality, stocks, and demand dynamics
 - Quantitative signals and backtesting
 - Comparative climate risk in related beverage crops (tea)
-- **Weather index derivatives & parametric insurance** (risk transfer, basis risk, product design)
+- Weather index derivatives & parametric insurance (risk transfer, basis risk, product design)
 
 ## Research Notes
 
 - [Weather Impact on Coffee Yields](research/weather-impact-on-coffee-yields.md)
 - [Climate Change Impact on Tea](research/climate-change-impact-on-tea.md)
 - [Quantitative Weather–Yield: Coffee vs Tea](research/quantitative-weather-yield-coffee-vs-tea.md)
-- [Weather Index Derivatives & Parametric Insurance](research/weather-index-derivatives-and-parametric-insurance.md) ← *new*
+- [Weather Index Derivatives & Parametric Insurance](research/weather-index-derivatives-and-parametric-insurance.md)
 
 ## Quantitative Pipeline (Steps 1–3)
 
@@ -32,21 +32,29 @@ Finding alpha in coffee prices as a commodity market – research, data analysis
 3. Tests whether weather anomalies improve short-term coffee price models (AIC/BIC, adj. R², out-of-sample)
 4. Provides both HAC (Newey–West) and Moving Block Bootstrap inference for short samples
 
-### Extension opportunity (parametric / derivatives)
-The same indices and yield models can be used to:
-- Design candidate parametric insurance underlyings
-- Quantify basis risk against historical yields
-- Prototype simple burn-analysis pricing and payout structures
-- Evaluate hedging effectiveness for supply-side risk
+## First Strategy & Backtest Framework
+
+- **Strategy**: [strategies/weather_stress_long.py](strategies/weather_stress_long.py) – long KC when stress proxy is elevated
+- **Backtester**: [src/backtest.py](src/backtest.py)
+- **Data loaders**: [src/data_loaders.py](src/data_loaders.py) (KC=F + synthetic stress placeholder)
+- **Walk-through**: [notebooks/03_first_strategy_backtest.md](notebooks/03_first_strategy_backtest.md)
+
+```bash
+pip install yfinance pandas numpy matplotlib
+python strategies/weather_stress_long.py
+```
+Produces a performance table and an equity-curve chart.  
+**Important**: the current stress series is synthetic (demo only). Replace it with real weather indices for meaningful results.
 
 ## Structure
 
 ```
 ├── research/          # Literature notes and findings
 ├── notebooks/         # Pipeline documentation & analysis
-├── src/               # Reusable code (indices, models, bootstrap)
+├── src/               # Reusable code (indices, models, bootstrap, backtest, loaders)
+├── strategies/        # Signal definitions and backtests
 ├── data/              # (to be populated) Raw & processed datasets
-└── strategies/        # Signal definitions and backtests
+└── artifacts/         # Generated charts / outputs (local)
 ```
 
 ## Key Insight
