@@ -123,3 +123,7 @@ If you use this repository, please cite the CITATION.cff file or:
 Code: MIT (see `LICENSE`).  
 Weather data: Open-Meteo / ERA5 — CC BY 4.0; attribution required.  
 Price data: Yahoo Finance terms of use apply; series are **not** redistributed in this repo.
+
+---
+
+Lab status: [STATUS.md](STATUS.md)
