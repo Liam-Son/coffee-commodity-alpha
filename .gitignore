@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+artifacts/*.png
+artifacts/*.csv
+artifacts/*.json
+data/raw/
+data/processed/
+*.ipynb_checkpoints/
+.DS_Store

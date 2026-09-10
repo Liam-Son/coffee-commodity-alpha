@@ -1,1 +1,3 @@
-"""Source package for coffee-commodity-alpha quantitative tools."""
+"""Coffee Commodity Alpha — research package."""
+
+__version__ = "0.3.0"
